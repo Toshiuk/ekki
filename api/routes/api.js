@@ -72,21 +72,19 @@ router.get('/historic/extract', passport.authenticate('jwt', { session: false })
   } else {
     return res.status(403).send({ success: false, msg: 'Unauthorized.' });
   }
-  return true;
 });
 
 router.get('/historic/balance', passport.authenticate('jwt', { session: false }), async (req, res) => {
   const token = getToken(req.headers);
   if (token) {
-    const extract = await Historic.balanceFromUserId(req.user.dataValues.id);
-    if (extract) { res.status(200).send({ extract }); }
+    const balance = await Historic.balanceFromUserId(req.user.dataValues.id);
+    if (balance) { res.status(200).send({ balance }); }
   } else {
     return res.status(403).send({ success: false, msg: 'Unauthorized.' });
   }
-  return true;
 });
 
-router.post('/historic', passport.authenticate('jwt', { session: false }), (req, res) => {
+router.post('/historic/transfer', passport.authenticate('jwt', { session: false }), (req, res) => {
   const token = getToken(req.headers);
   if (token) {
     Historic
@@ -100,7 +98,40 @@ router.post('/historic', passport.authenticate('jwt', { session: false }), (req,
   } else {
     return res.status(403).send({ success: false, msg: 'Unauthorized.' });
   }
-  return true;
+});
+
+router.post('/historic/deposit', passport.authenticate('jwt', { session: false }), async (req, res) => {
+  const token = getToken(req.headers);
+  let response = '';
+  if (token) {
+    response = await Historic.deposit(req.user.dataValues.id, req.body.value);
+  }
+  return res.status(201).send(response) || res.status(403).send({ success: false, msg: 'Unauthorized.' });
+});
+
+router.post('/historic/withdraw', passport.authenticate('jwt', { session: false }), async (req, res) => {
+  const token = getToken(req.headers);
+  let response = '';
+  if (token) {
+    response = await Historic.withdraw(req.user.dataValues.id, req.body.value);
+  }
+  return res.status(201).send(response) || res.status(403).send({ success: false, msg: 'Unauthorized.' });
+});
+
+router.post('/historic/transfer', passport.authenticate('jwt', { session: false }), (req, res) => {
+  const token = getToken(req.headers);
+  if (token) {
+    Historic
+      .create({
+        value: req.body.value,
+        senderId: req.user.dataValues.id,
+        receiverId: req.body.receiverId,
+      })
+      .then(historic => res.status(201).send(historic))
+      .catch(error => res.status(400).send(error));
+  } else {
+    return res.status(403).send({ success: false, msg: 'Unauthorized.' });
+  }
 });
 
 module.exports = router;

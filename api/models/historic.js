@@ -9,38 +9,49 @@ module.exports = (sequelize, DataTypes) => {
     receiverId: DataTypes.INTEGER,
   }, {});
 
+  Historic.beforeCreate((historic) => {
+    console.log('oi');
+    Historic.destroy({
+      where: {
+        value: historic.value,
+        senderId: historic.senderId,
+        receiverId: historic.receiverId,
+        createdAt: {
+          [Op.gt]: new Date(Date.now() - (2 * 60 * 1000)),
+        },
+      },
+    });
+    console.log('quale');
+    return false;
+  });
 
-  Historic.deposit = function (receiverId, value) {
-    this.create({
+  Historic.deposit = async function (receiverId, value) {
+    let response = '';
+    await this.create({
       value,
       senderId: 0,
       receiverId,
-    });
+    }).then(historic => response = historic)
+      .catch(error => response = error);
+    return response;
   };
 
-  Historic.withdraw = function (senderId, value) {
-    this.create({
+  Historic.withdraw = async function (senderId, value) {
+    let response = '';
+    await this.create({
       value,
       senderId,
       receiverId: 0,
-    });
+    }).then(historic => response = historic)
+      .catch(error => response = error);
+    return response;
   };
 
   Historic.balanceFromUserId = async function (userId) {
     const extract = await Historic.findAllFromUserId(userId);
-    const balance = await extract.reduce((acc, historic) => {
-      if (acc.value) {
-        return historic.senderId == userId ? acc.value * -1 : acc.value;
-      }
-      if (historic.senderId == userId) {
-        acc -= parseFloat(historic.value);
-      } else {
-        acc += parseFloat(historic.value);
-      }
+    const convert = await extract.map(e => (e.senderId == userId ? (-1 * e.value) : (e.value)));
 
-      return acc;
-    });
-    console.log(balance);
+    const balance = await convert.reduce((acc, e) => acc + e);
     return balance;
   };
 
