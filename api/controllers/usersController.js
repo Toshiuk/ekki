@@ -60,6 +60,16 @@ module.exports = {
       })
       .catch(error => res.status(400).send(error));
   },
+  async listAllUsers(req, res) {
+    const token = getToken(req.headers);
+    if (token) {
+      const allUsers = await User.findAll();
+      if (allUsers) { res.status(200).send(allUsers); }
+    } else {
+      return res.status(403).send({ success: false, msg: 'Unauthorized.' });
+    }
+    return res.status(201).send({ success: true, msg: 'No users found.' });
+  },
 
   async extract(req, res) {
     const token = getToken(req.headers);
@@ -69,6 +79,7 @@ module.exports = {
     } else {
       return res.status(403).send({ success: false, msg: 'Unauthorized.' });
     }
+    return res.status(201).send({ success: true, msg: 'No extract found.' });
   },
   async balance(req, res) {
     const token = getToken(req.headers);
@@ -78,6 +89,7 @@ module.exports = {
     } else {
       return res.status(403).send({ success: false, msg: 'Unauthorized.' });
     }
+    return res.status(201).send({ success: true, msg: 'No balance found.' });
   },
   async transfer(req, res) {
     const token = getToken(req.headers);

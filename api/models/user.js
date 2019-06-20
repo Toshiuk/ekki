@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
           User.findOne({
             where: { cpf: value },
           }).done((user) => {
-            if (user) {return next('CPF already in use');}
+            if (user) { return next('CPF already in use'); }
 
             next();
           });
@@ -76,6 +76,18 @@ module.exports = (sequelize, DataTypes) => {
     User.transfer = function (sender, receiver, value) {
       return models.Historic.transfer(sender.id, receiver, value);
     };
+
+    User.belongsToMany(User, {
+      as: 'user',
+      foreignKey: 'userId',
+      through: 'Contact',
+    });
+
+    User.belongsToMany(User, {
+      as: 'contact',
+      foreignKey: 'contactId',
+      through: 'Contact',
+    });
   };
 
 
