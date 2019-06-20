@@ -6,11 +6,24 @@ const { Op } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   const Historic = sequelize.define('Historic', {
     value: DataTypes.FLOAT,
+    receiverId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: sequelize.models.User,
+        key: 'id',
+      },
+    },
+    senderId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: sequelize.models.User,
+        key: 'id',
+      },
+    },
   }, {});
 
 
   Historic.beforeCreate((historic) => {
-    console.log(historic);
     Historic.destroy({
       where: {
         value: historic.value,
@@ -25,27 +38,13 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   Historic.deposit = async function (receiverId, value) {
-    let response = '';
-    await this.create({
-      value,
-      senderId: 3,
-      receiver: receiverId.id,
-    }).then(historic => response = historic)
-      .catch(error => response = error);
-
-    return response;
+    return Historic.transfer(null, receiverId.id, value);
   };
 
   Historic.withdraw = async function (senderId, value) {
-    let response = '';
-    await this.create({
-      value,
-      senderId,
-      receiverId: null,
-    }).then(historic => response = historic)
-      .catch(error => response = error);
-    return response;
+    return Historic.transfer(senderId.id, null, value);
   };
+
 
   Historic.balanceFromUserId = async function (userId) {
     const extract = await Historic.findAllFromUserId(userId);
@@ -78,8 +77,26 @@ module.exports = (sequelize, DataTypes) => {
 
 
   Historic.associate = function (models) {
-    Historic.hasOne(models.User, { as: 'sender', allowNull: true });
-    Historic.hasOne(models.User, { as: 'receiver', allowNull: true });
+    Historic.transfer = async function (senderId, receiverId, value) {
+      let response = '';
+
+      if (senderId && receiverId) {
+        if (!(await models.User.exist(receiverId))) { return { success: false, msg: 'User does not exist.' }; }
+      }
+
+      if (senderId) {
+        const balance = await Historic.balanceFromUserId(senderId);
+        if (balance - value <= -500) { return { success: false, msg: 'User account balance is insufficient.' }; }
+      }
+      await this.create({
+        value,
+        senderId,
+        receiverId,
+      }).then(historic => response = historic)
+        .catch(error => response = error);
+
+      return response;
+    };
   };
   return Historic;
 };

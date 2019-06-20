@@ -4,10 +4,33 @@ const bcrypt = require('bcrypt-nodejs');
 
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
-    name: DataTypes.STRING,
-    password: DataTypes.STRING,
-    cpf: DataTypes.STRING,
-    phone: DataTypes.STRING,
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    cpf: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        isUnique(value, next) {
+          User.findOne({
+            where: { cpf: value },
+          }).done((user) => {
+            if (user) {return next('CPF already in use');}
+
+            next();
+          });
+        },
+      },
+    },
+    phone: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
   }, {});
 
 
@@ -22,11 +45,6 @@ module.exports = (sequelize, DataTypes) => {
   });
 
 
-  User.deposit = function (id, value) {
-    const { Historic } = this.sequelize.models;
-    Historic.deposit(id, value);
-  };
-
   User.prototype.comparePassword = function (passw, cb) {
     bcrypt.compare(passw, this.password, (err, isMatch) => {
       if (err) {
@@ -36,7 +54,30 @@ module.exports = (sequelize, DataTypes) => {
     });
   };
 
-  User.associate = function (models) {
+  User.exist = async function (id) {
+    user = await User.findOne({
+      where: {
+        id,
+      },
+    });
+
+    return !!user;
   };
+
+  User.associate = function (models) {
+    User.deposit = function (id, value) {
+      return models.Historic.deposit(id, value);
+    };
+
+    User.withdraw = function (id, value) {
+      return models.Historic.withdraw(id, value);
+    };
+
+    User.transfer = function (sender, receiver, value) {
+      return models.Historic.transfer(sender.id, receiver, value);
+    };
+  };
+
+
   return User;
 };
