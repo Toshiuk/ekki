@@ -9,6 +9,8 @@ module.exports = (sequelize, DataTypes) => {
     cpf: DataTypes.STRING,
     phone: DataTypes.STRING,
   }, {});
+
+
   User.beforeSave((user) => {
     if (user.changed('password')) {
       user.password = bcrypt.hashSync(user.password, bcrypt.genSaltSync(10), null);
@@ -16,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   User.afterCreate((user) => {
-    User.deposit(user.dataValues.id, 1000);
+    User.deposit(user, 1000);
   });
 
 
@@ -35,7 +37,6 @@ module.exports = (sequelize, DataTypes) => {
   };
 
   User.associate = function (models) {
-    // associations can be defined here
   };
   return User;
 };

@@ -1,7 +1,7 @@
-'use strict';
+
+
 module.exports = {
-  up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Historics', {
+  up: (queryInterface, Sequelize) => queryInterface.createTable('Historics', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -12,10 +12,20 @@ module.exports = {
         type: Sequelize.FLOAT
       },
       senderId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Users',
+          key: 'id',
+          as: 'senderId',
+        },
       },
       receiverId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Users',
+          key: 'id',
+          as: 'receiverId',
+        },
       },
       createdAt: {
         allowNull: false,
@@ -25,9 +35,6 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       }
-    });
-  },
-  down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Historics');
-  }
+    }),
+  down: (queryInterface, Sequelize) => queryInterface.dropTable('Historics'),
 };

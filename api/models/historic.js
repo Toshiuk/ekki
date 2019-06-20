@@ -2,26 +2,25 @@
 
 const { Op } = require('sequelize');
 
+
 module.exports = (sequelize, DataTypes) => {
   const Historic = sequelize.define('Historic', {
     value: DataTypes.FLOAT,
-    senderId: DataTypes.INTEGER,
-    receiverId: DataTypes.INTEGER,
   }, {});
 
+
   Historic.beforeCreate((historic) => {
-    console.log('oi');
+    console.log(historic);
     Historic.destroy({
       where: {
         value: historic.value,
-        senderId: historic.senderId,
-        receiverId: historic.receiverId,
+        senderId: historic.senderId || null,
+        receiverId: historic.receiverId || null,
         createdAt: {
           [Op.gt]: new Date(Date.now() - (2 * 60 * 1000)),
         },
       },
     });
-    console.log('quale');
     return false;
   });
 
@@ -29,10 +28,11 @@ module.exports = (sequelize, DataTypes) => {
     let response = '';
     await this.create({
       value,
-      senderId: 0,
-      receiverId,
+      senderId: 3,
+      receiver: receiverId.id,
     }).then(historic => response = historic)
       .catch(error => response = error);
+
     return response;
   };
 
@@ -41,7 +41,7 @@ module.exports = (sequelize, DataTypes) => {
     await this.create({
       value,
       senderId,
-      receiverId: 0,
+      receiverId: null,
     }).then(historic => response = historic)
       .catch(error => response = error);
     return response;
@@ -78,7 +78,8 @@ module.exports = (sequelize, DataTypes) => {
 
 
   Historic.associate = function (models) {
-    // associations can be defined here
+    Historic.hasOne(models.User, { as: 'sender', allowNull: true });
+    Historic.hasOne(models.User, { as: 'receiver', allowNull: true });
   };
   return Historic;
 };
