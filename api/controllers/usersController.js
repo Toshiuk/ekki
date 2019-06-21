@@ -23,7 +23,7 @@ const signup = (req, res) => {
   }
 };
 
-const signin = (req, res) => {
+const login = (req, res) => {
   User
     .findOne({
       where: {
@@ -111,7 +111,7 @@ const withdraw = async (req, res) => {
 
 module.exports = {
   signup,
-  signin,
+  login,
   listAllUsers,
   extract,
   balance,

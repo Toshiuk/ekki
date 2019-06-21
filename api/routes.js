@@ -10,7 +10,7 @@ const userPassport = passport.authenticate('jwt', { session: false });
 
 const router = express.Router();
 
-router.post('/signin', usersController.signin);
+router.post('/login', usersController.login);
 router.post('/signup', usersController.signup);
 router.get('/user/list', userPassport, usersController.listAllUsers);
 router.get('/dashboard/extract', userPassport, usersController.extract);
