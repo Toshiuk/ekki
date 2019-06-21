@@ -1,53 +1,45 @@
-const jwt = require('jsonwebtoken');
 const { Contact, User } = require('../models');
+const { getToken } = require('../helpers/token');
 
 
-const getToken = function getToken(headers) {
-  if (headers && headers.authorization) {
-    const parted = headers.authorization.split(' ');
-    if (parted.length === 2) {
-      return parted[1];
-    }
-    return null;
+const listUserContact = async function listUserContact(req, res) {
+  const token = getToken(req.headers);
+  let response = '';
+  if (token) {
+    response = await Contact.findAll({
+      where: { userId: req.user.dataValues.id },
+      include: [
+        {
+          model: User,
+          as: 'contact',
+          attributes: ['name', 'phone'],
+        },
+      ],
+    });
   }
-  return null;
+  return res.status(201).send(response) || res.status(403).send({ success: false, msg: 'Unauthorized.' });
 };
 
+const createContact = async function createContact(req, res) {
+  const token = getToken(req.headers);
+  let response = '';
+  if (token) {
+    response = await Contact.add(req.user.dataValues.id, req.body.contactId);
+  }
+  return res.status(201).send(response) || res.status(403).send({ success: false, msg: 'Unauthorized.' });
+};
+
+const destroyContact = async function destroyContact(req, res) {
+  const token = getToken(req.headers);
+  let response = '';
+  if (token) {
+    response = await Contact.destroy(req.user.dataValues.id, req.body.contactId);
+  }
+  return res.status(201).send(response) || res.status(403).send({ success: false, msg: 'Unauthorized.' });
+};
 
 module.exports = {
-  async listUserContact(req, res) {
-    const token = getToken(req.headers);
-    let response = '';
-    if (token) {
-      response = await Contact.findAll({
-        where: { userId: req.user.dataValues.id },
-        include: [
-          {
-            model: User,
-            as: 'contact',
-            attributes: ['name'],
-          },
-        ],
-      });
-    }
-    return res.status(201).send(response) || res.status(403).send({ success: false, msg: 'Unauthorized.' });
-  },
-
-  async createContact(req, res) {
-    const token = getToken(req.headers);
-    let response = '';
-    if (token) {
-      response = await Contact.add(req.user.dataValues.id, req.body.contactId);
-    }
-    return res.status(201).send(response) || res.status(403).send({ success: false, msg: 'Unauthorized.' });
-  },
-  async destroyContact(req, res) {
-    const token = getToken(req.headers);
-    let response = '';
-    if (token) {
-      response = await Contact.destroy(req.user.dataValues.id, req.body.contactId);
-    }
-    return res.status(201).send(response) || res.status(403).send({ success: false, msg: 'Unauthorized.' });
-  },
-
+  listUserContact,
+  createContact,
+  destroyContact,
 };

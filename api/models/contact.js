@@ -3,7 +3,6 @@ module.exports = (sequelize, DataTypes) => {
 
   }, {});
 
-
   Contact.add = async (userId, contactId) => {
     const contact = await Contact.exist(userId, contactId);
     if (contact) {
@@ -23,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
 
   Contact.exist = async (userId, contactId) => Contact.findOne({ where: { userId, contactId } });
 
-  Contact.associate = function (models) {
+  Contact.associate = (models) => {
     Contact.belongsTo(models.User, {
       as: 'user',
       foreignKey: 'userId',

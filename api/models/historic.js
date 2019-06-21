@@ -2,10 +2,21 @@
 
 const { Op } = require('sequelize');
 
-
 module.exports = (sequelize, DataTypes) => {
   const Historic = sequelize.define('Historic', {
-    value: DataTypes.FLOAT,
+    value: {
+      type: DataTypes.FLOAT,
+      allowNull: {
+        args: false,
+        msg: 'Must be not null',
+      },
+      validate: {
+        min: {
+          args: 1,
+          msg: 'Must be higher or equal than one',
+        },
+      },
+    },
     receiverId: {
       type: DataTypes.INTEGER,
       references: {
@@ -22,7 +33,6 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {});
 
-
   Historic.beforeCreate((historic) => {
     Historic.destroy({
       where: {
@@ -37,26 +47,21 @@ module.exports = (sequelize, DataTypes) => {
     return false;
   });
 
-  Historic.deposit = async function (receiverId, value) {
-    return Historic.transfer(null, receiverId.id, value);
-  };
+  Historic.deposit = async (receiverId, value) => Historic.transfer(null, receiverId.id, value);
 
-  Historic.withdraw = async function (senderId, value) {
-    return Historic.transfer(senderId.id, null, value);
-  };
+  Historic.withdraw = async (senderId, value) => Historic.transfer(senderId.id, null, value);
 
-
-  Historic.balanceFromUserId = async function (userId) {
+  Historic.balanceFromUserId = async (userId) => {
     const extract = await Historic.findAllFromUserId(userId);
-    const convert = await extract.map(e => (e.senderId == userId ? (-1 * e.value) : (e.value)));
+    const convert = await extract.map(e => (e.senderId === userId ? (-1 * e.value) : (e.value)));
 
     const balance = await convert.reduce((acc, e) => acc + e);
     return balance;
   };
 
-  Historic.findAllFromUserId = async function (userId) {
+  Historic.findAllFromUserId = async (userId) => {
     let extract = [];
-    await this.findAll({
+    await Historic.findAll({
       where: {
         [Op.or]: [
           {
@@ -76,8 +81,8 @@ module.exports = (sequelize, DataTypes) => {
   };
 
 
-  Historic.associate = function (models) {
-    Historic.transfer = async function (senderId, receiverId, value) {
+  Historic.associate = (models) => {
+    Historic.transfer = async (senderId, receiverId, value) => {
       let response = '';
 
       if (senderId && receiverId) {
@@ -88,7 +93,7 @@ module.exports = (sequelize, DataTypes) => {
         const balance = await Historic.balanceFromUserId(senderId);
         if (balance - value <= -500) { return { success: false, msg: 'User account balance is insufficient.' }; }
       }
-      await this.create({
+      await Historic.create({
         value,
         senderId,
         receiverId,

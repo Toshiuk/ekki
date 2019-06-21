@@ -6,15 +6,24 @@ module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
     name: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: {
+        args: false,
+        msg: 'Must be not null',
+      },
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: {
+        args: false,
+        msg: 'Must be not null',
+      },
     },
     cpf: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: {
+        args: false,
+        msg: 'Must be not null',
+      },
       validate: {
         isUnique(value, next) {
           User.findOne({
@@ -29,7 +38,10 @@ module.exports = (sequelize, DataTypes) => {
     },
     phone: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: {
+        args: false,
+        msg: 'Must be not null',
+      },
     },
   }, {});
 
@@ -50,32 +62,18 @@ module.exports = (sequelize, DataTypes) => {
       if (err) {
         return cb(err);
       }
-      cb(null, isMatch);
+      return cb(null, isMatch);
     });
   };
 
-  User.exist = async function (id) {
-    user = await User.findOne({
-      where: {
-        id,
-      },
-    });
+  User.exist = async id => !!await User.findByPk(id);
 
-    return !!user;
-  };
+  User.associate = (models) => {
+    User.deposit = (id, value) => models.Historic.deposit(id, value);
 
-  User.associate = function (models) {
-    User.deposit = function (id, value) {
-      return models.Historic.deposit(id, value);
-    };
+    User.withdraw = (id, value) => models.Historic.withdraw(id, value);
 
-    User.withdraw = function (id, value) {
-      return models.Historic.withdraw(id, value);
-    };
-
-    User.transfer = function (sender, receiver, value) {
-      return models.Historic.transfer(sender.id, receiver, value);
-    };
+    User.transfer = (sender, receiver, value) => models.Historic.transfer(sender.id, receiver, value);
 
     User.belongsToMany(User, {
       as: 'user',
