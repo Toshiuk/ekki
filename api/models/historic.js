@@ -81,10 +81,6 @@ module.exports = (sequelize, DataTypes) => {
         receiverId,
       }).then(historic => response = { success: true, msg: 'Bank transference succeded.' })
         .catch(error => response = { success: false, msg: 'User account Error.' });
-      console.log(value);
-      console.log(senderId);
-      console.log(receiverId);
-      console.log(response);
       return response;
     };
 

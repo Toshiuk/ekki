@@ -74,6 +74,7 @@ module.exports = (sequelize, DataTypes) => {
 
   User.exist = async id => !!await User.findByPk(id);
 
+
   User.associate = (models) => {
     User.deposit = (id, value) => models.Historic.deposit(id, value);
 

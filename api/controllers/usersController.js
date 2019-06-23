@@ -64,7 +64,7 @@ const listAllUsers = async (req, res) => {
         exclude: ['password', 'updatedAt', 'cpf'],
       },
     });
-    if (allUsers) { res.status(200).send(allUsers); }
+    if (allUsers) { return res.status(200).send(allUsers); }
   } else {
     return res.status(403).send({ success: false, msg: 'Unauthorized.' });
   }
