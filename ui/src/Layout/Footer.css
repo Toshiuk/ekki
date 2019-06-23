@@ -4,6 +4,7 @@ footer#main-footer{
     border-top: 1px solid #DDD;
     bottom: 0px;
     position: relative;
+    margin-top: 20px;
 }
 
 footer#main-footer .footer-content{

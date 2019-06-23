@@ -2,39 +2,43 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => queryInterface.createTable('Historics', {
-      id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: Sequelize.INTEGER
+    id: {
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+      type: Sequelize.INTEGER,
+    },
+    value: {
+      type: Sequelize.FLOAT,
+    },
+    senderId: {
+      type: Sequelize.UUID,
+      allowNull: true,
+      references: {
+        model: 'Users',
+        key: 'id',
+        as: 'senderId',
+        through: 'Historic',
       },
-      value: {
-        type: Sequelize.FLOAT
+    },
+    receiverId: {
+      type: Sequelize.UUID,
+      allowNull: true,
+      references: {
+        model: 'Users',
+        key: 'id',
+        as: 'receiverId',
+        through: 'Historic',
       },
-      senderId: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'Users',
-          key: 'id',
-          as: 'senderId',
-        },
-      },
-      receiverId: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'Users',
-          key: 'id',
-          as: 'receiverId',
-        },
-      },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      }
-    }),
+    },
+    createdAt: {
+      allowNull: false,
+      type: Sequelize.DATE,
+    },
+    updatedAt: {
+      allowNull: false,
+      type: Sequelize.DATE,
+    },
+  }),
   down: (queryInterface, Sequelize) => queryInterface.dropTable('Historics'),
 };

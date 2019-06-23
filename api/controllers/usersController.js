@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-
+const { Op } = require('sequelize');
 const { Historic } = require('../models');
 const { User } = require('../models');
 const { getToken } = require('../helpers/token');
@@ -52,7 +52,18 @@ const login = (req, res) => {
 const listAllUsers = async (req, res) => {
   const token = getToken(req.headers);
   if (token) {
-    const allUsers = await User.findAll();
+    const allUsers = await User.findAll({
+      where: {
+        [Op.not]: [
+          {
+            id: req.user.dataValues.id,
+          },
+        ],
+      },
+      attributes: {
+        exclude: ['password', 'updatedAt', 'cpf'],
+      },
+    });
     if (allUsers) { res.status(200).send(allUsers); }
   } else {
     return res.status(403).send({ success: false, msg: 'Unauthorized.' });
@@ -64,7 +75,7 @@ const extract = async (req, res) => {
   const token = getToken(req.headers);
   if (token) {
     const extractUser = await Historic.findAllFromUserId(req.user.dataValues.id);
-    if (extractUser) { res.status(200).send(extractUser); }
+    if (extractUser) { return res.status(200).send(extractUser); }
   } else {
     return res.status(403).send({ success: false, msg: 'Unauthorized.' });
   }
@@ -75,7 +86,7 @@ const balance = async (req, res) => {
   const token = getToken(req.headers);
   if (token) {
     const balanceUser = await Historic.balanceFromUserId(req.user.dataValues.id);
-    if (balanceUser) { res.status(200).send({ balanceUser }); }
+    if (balanceUser) { return res.status(200).send({ balanceUser }); }
   } else {
     return res.status(403).send({ success: false, msg: 'Unauthorized.' });
   }
@@ -88,6 +99,10 @@ const transfer = async (req, res) => {
   if (token) {
     response = await User.transfer(req.user.dataValues, req.body.receiverId, req.body.value);
   }
+  if (response.success) {
+    const userBalance = await Historic.balanceFromUserId(req.user.dataValues.id);
+    req.io.emit('balance', userBalance);
+  }
   return res.status(201).send(response) || res.status(403).send({ success: false, msg: 'Unauthorized.' });
 };
 
@@ -97,6 +112,10 @@ const deposit = async (req, res) => {
   if (token) {
     response = await User.deposit(req.user.dataValues, req.body.value);
   }
+  if (response.success) {
+    const userBalance = await Historic.balanceFromUserId(req.user.dataValues.id);
+    req.io.emit('balance', userBalance);
+  }
   return res.status(201).send(response) || res.status(403).send({ success: false, msg: 'Unauthorized.' });
 };
 
@@ -105,6 +124,10 @@ const withdraw = async (req, res) => {
   let response = '';
   if (token) {
     response = await User.withdraw(req.user.dataValues, req.body.value);
+  }
+  if (response.success) {
+    const userBalance = await Historic.balanceFromUserId(req.user.dataValues.id);
+    req.io.emit('balance', userBalance);
   }
   return res.status(201).send(response) || res.status(403).send({ success: false, msg: 'Unauthorized.' });
 };

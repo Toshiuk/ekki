@@ -8,13 +8,14 @@ module.exports = (sequelize, DataTypes) => {
     if (contact) {
       return { success: false, msg: 'Contact realation already exist.' };
     }
-    return Contact.create({ userId, contactId });
+    await Contact.create({ userId, contactId });
+    return { success: true, msg: 'Contact Add.' };
   };
 
   Contact.destroy = async (userId, contactId) => {
     const contact = await Contact.exist(userId, contactId);
     if (contact) {
-      contact.destroy();
+      await contact.destroy();
       return { success: true, msg: 'Contact deleted.' };
     }
     return { success: false, msg: 'Contact realation does not exist.' };

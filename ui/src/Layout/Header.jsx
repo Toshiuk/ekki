@@ -5,37 +5,50 @@ import './Header.css';
 
 
 export default function Header() {
-  return (
-    <header id="main-header">
-      <div className="header-content">
-        <Link to="/">
-          Ekki Bank
-        </Link>
-        <div className="columns is-vcentered is-mobile ">
-          {sessionStorage.getItem('token') != undefined
-            ? (
-              <React.Fragment>
-                <Link className="column is-half" to="/dashboard">
-                  Dashboard
-                </Link>
-                <Link className="column is-half" to="/dashboard">
-                  Logout
-                </Link>
-              </React.Fragment>
-            ) : (
-              <React.Fragment>
-                <Link className="column is-half" to="/login">
-                  Login
-                </Link>
-                <Link className="column is-half" to="/signup">
-                  Signup
-                </Link>
-              </React.Fragment>
-            )
-          }
-        </div>
+  const handleLogout = (e) => {
+    e.preventDefault();
+    sessionStorage.clear();
+    window.location.href = '/';
+  };
 
-      </div>
+  return (
+
+
+    <header id="main-header">
+      <nav className="header-content" role="navigation" aria-label="main navigation">
+        <div className="navbar-start">
+          <Link className="navbar-item" to="/">
+            Ekki Bank
+          </Link>
+        </div>
+        <div className="navbar-end">
+          <div className="navbar-item">
+
+            {sessionStorage.getItem('token') != null
+              ? (
+                <div className="buttons">
+                  <Link className="button is-size-7-mobile is-primary" to="/dashboard/extract">
+                    Dashboard
+                  </Link>
+                  <div className="button is-size-7-mobile is-light" onClick={handleLogout}>
+                    Logout
+                  </div>
+                </div>
+              ) : (
+                <div className="buttons">
+                  <Link className="button is-size-7-mobile is-primary" to="/login">
+                    Login
+                  </Link>
+                  <Link className="button is-size-7-mobile is-light" to="/signup">
+                    Signup
+                  </Link>
+                </div>
+              )
+            }
+
+          </div>
+        </div>
+      </nav>
     </header>
   );
 }

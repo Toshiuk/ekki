@@ -4,42 +4,80 @@ import './Main.css';
 
 class Main extends Component {
 
-    state = {
-        Main: [],
-    };
+  state = {
+    Main: [],
+  };
 
-    render() {
-        return (
-            <section id="main">
-                <h1 className="title">Bulma</h1>
-                <p className="subtitle">
-                    Super style!
+  render() {
+    return (
+      <section id="main">
+        <h1 className="title">Ekki by Flávio Toshiuk</h1>
+        <p className="subtitle">
+          Ekki Bank, Challenge held for the 4All test.
+  Using Node.js and React.
+  
                 </p>
-
-                <div className="field">
-                    <div className="control">
-                        <input className="input" type="text" placeholder="Input" />
-                    </div>
+        <div className="level">
+          <div className="level-item dropdown is-hoverable">
+            <div className="dropdown-trigger">
+              <button className="button is-medium" >
+                <span>Node.js</span>
+              </button>
+            </div>
+            <div className="dropdown-menu" id="dropdown-node" role="menu">
+              <div className="dropdown-content">
+                <div className="dropdown-item">
+                  <ul>
+                    <li>> Express</li>
+                    <li>> Socket.io</li>
+                    <li>> MVC</li>
+                    <li>> JWT</li>
+                  </ul>
                 </div>
-
-                <div className="field">
-                    <p className="control">
-                        <div class="select">
-                            <select>
-                                <option>Select dropdown</option>
-                                <option>With options</option>
-                            </select>
-                        </div>
-                    </p>
+              </div>
+            </div>
+          </div>
+          <div className="level-item dropdown is-hoverable">
+            <div className="dropdown-trigger">
+              <button className="button is-medium" >
+                <span>React</span>
+              </button>
+            </div>
+            <div className="dropdown-menu" id="dropdown-node" role="menu">
+              <div className="dropdown-content">
+                <div className="dropdown-item">
+                  <ul>
+                    <li>> Axios</li>
+                    <li>> Socket.io</li>
+                    <li>> MVC</li>
+                    <li>> Single Page Aplication</li>
+                  </ul>
                 </div>
-
-                <div className="buttons">
-                    <a href="/" className="button is-primary">Primary</a>
-                    <a href="/" className="button is-link">Link</a>
+              </div>
+            </div>
+          </div>
+          <div className="level-item dropdown is-hoverable">
+            <div className="dropdown-trigger">
+              <button className="button is-medium" >
+                <span>Css</span>
+              </button>
+            </div>
+            <div className="dropdown-menu" id="dropdown-node" role="menu">
+              <div className="dropdown-content">
+                <div className="dropdown-item">
+                  <ul>
+                    <li>> Bulma</li>
+                  </ul>
                 </div>
-            </section>
-        );
-    }
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+    );
+  }
 }
 
 export default Main;

@@ -1,12 +1,11 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 
 import './Footer.css';
 
 export default function Footer() {
   return (
-    <footer id="main-footer">
-      <div className="footer-content">
+    <footer id="main-footer" className="footer">
+      <div className="content footer-content">
         <a href="https://github.com/Toshiuk">
           Github
         </a>
@@ -15,5 +14,6 @@ export default function Footer() {
         </a>
       </div>
     </footer>
+
   );
 }

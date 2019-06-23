@@ -17,20 +17,6 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
     },
-    receiverId: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: sequelize.models.User,
-        key: 'id',
-      },
-    },
-    senderId: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: sequelize.models.User,
-        key: 'id',
-      },
-    },
   }, {});
 
   Historic.beforeCreate((historic) => {
@@ -59,29 +45,19 @@ module.exports = (sequelize, DataTypes) => {
     return balance;
   };
 
-  Historic.findAllFromUserId = async (userId) => {
-    let extract = [];
-    await Historic.findAll({
-      where: {
-        [Op.or]: [
-          {
-            senderId: userId,
-          },
-          {
-            receiverId: userId,
-          },
-        ],
-      },
-    })
-      .then((historics) => {
-        extract = historics;
-      })
-      .catch((error) => { console.log(error); });
-    return extract;
-  };
-
-
   Historic.associate = (models) => {
+    Historic.belongsTo(models.User, {
+      as: 'sender',
+      foreignKey: 'senderId',
+      onDelete: 'CASCADE',
+    });
+
+    Historic.belongsTo(models.User, {
+      as: 'receiver',
+      foreignKey: 'receiverId',
+      onDelete: 'CASCADE',
+    });
+
     Historic.transfer = async (senderId, receiverId, value) => {
       let response = '';
 
@@ -97,10 +73,47 @@ module.exports = (sequelize, DataTypes) => {
         value,
         senderId,
         receiverId,
-      }).then(historic => response = historic)
-        .catch(error => response = error);
+      }).then(historic => response = { success: true, msg: 'Bank transference succeded.' })
+        .catch(error => response = { success: false, msg: 'User account Error.' });
 
       return response;
+    };
+
+
+    Historic.findAllFromUserId = async (userId) => {
+      let extract = [];
+      await Historic.findAll({
+        where: {
+          [Op.or]: [
+            {
+              senderId: userId,
+            },
+            {
+              receiverId: userId,
+            },
+          ],
+
+
+        },
+        include: [
+          {
+            model: models.User,
+            as: 'receiver',
+            attributes: ['id', 'name'],
+          },
+          {
+            model: models.User,
+            as: 'sender',
+            attributes: ['id', 'name'],
+          },
+        ],
+      })
+        .then((historics) => {
+          extract = historics;
+        })
+        .catch((error) => { console.log(error); });
+
+      return extract;
     };
   };
   return Historic;

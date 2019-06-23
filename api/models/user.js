@@ -4,6 +4,11 @@ const bcrypt = require('bcrypt-nodejs');
 
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
+    id: {
+      type: DataTypes.UUID,
+      primaryKey: true,
+      defaultValue: DataTypes.UUIDV4,
+    },
     name: {
       type: DataTypes.STRING,
       allowNull: {
@@ -53,6 +58,7 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   User.afterCreate((user) => {
+    console.log('aqui');
     User.deposit(user, 1000);
   });
 
@@ -85,6 +91,18 @@ module.exports = (sequelize, DataTypes) => {
       as: 'contact',
       foreignKey: 'contactId',
       through: 'Contact',
+    });
+
+    User.belongsToMany(User, {
+      as: 'sender',
+      foreignKey: 'senderId',
+      through: 'Historic',
+    });
+
+    User.belongsToMany(User, {
+      as: 'receiver',
+      foreignKey: 'receiverId',
+      through: 'Historic',
     });
   };
 

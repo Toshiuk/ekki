@@ -26,6 +26,19 @@ const createContact = async function createContact(req, res) {
   if (token) {
     response = await Contact.add(req.user.dataValues.id, req.body.contactId);
   }
+  if (response.success) {
+    const userContacts = await Contact.findAll({
+      where: { userId: req.user.dataValues.id },
+      include: [
+        {
+          model: User,
+          as: 'contact',
+          attributes: ['name', 'phone'],
+        },
+      ],
+    });
+    req.io.emit('contacts', userContacts);
+  }
   return res.status(201).send(response) || res.status(403).send({ success: false, msg: 'Unauthorized.' });
 };
 
@@ -34,6 +47,20 @@ const destroyContact = async function destroyContact(req, res) {
   let response = '';
   if (token) {
     response = await Contact.destroy(req.user.dataValues.id, req.body.contactId);
+  }
+
+  if (response.success) {
+    const userContacts = await Contact.findAll({
+      where: { userId: req.user.dataValues.id },
+      include: [
+        {
+          model: User,
+          as: 'contact',
+          attributes: ['name', 'phone'],
+        },
+      ],
+    });
+    req.io.emit('contacts', userContacts);
   }
   return res.status(201).send(response) || res.status(403).send({ success: false, msg: 'Unauthorized.' });
 };
