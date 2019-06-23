@@ -4,7 +4,7 @@ import Title from '../components/Title'
 import FormValue from '../components/FormValue'
 import { Redirect } from 'react-router-dom';
 import Loading from '../../../components/Loading';
-import Alerts from '../components/Alerts'
+import Alerts from '../../../components/Alerts'
 
 
 class Deposit extends Component {

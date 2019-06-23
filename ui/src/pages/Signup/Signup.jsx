@@ -2,7 +2,7 @@ import React from "react";
 import SignupForm from "./components/SignupForm";
 import api from "../../services/api";
 import { Link, Redirect } from 'react-router-dom';
-
+import Alerts from '../../components/Alerts'
 import Loading from '../../components/Loading';
 
 class Signup extends React.Component {
@@ -22,10 +22,10 @@ class Signup extends React.Component {
         password
       })
       .then(async response => {
-        alert(response.statusText);
+        response.data.success ? Alerts.success(response.data.msg) : Alerts.warning(response.data.msg)
         this.setState({ loading: false, redirect: true });
       })
-      .catch(err => alert(err.response.data.error));
+      .catch(err => Alerts.warning(err.response.data.msg));
     this.setState({ loading: false });
   };
 

@@ -21,7 +21,9 @@ class Login extends React.Component {
         password
       })
       .then(async response => {
+        console.log(response)
         await sessionStorage.setItem("token", response.data.token);
+        await sessionStorage.setItem("id", response.data.id);
         this.setState({ loading: false });
         window.location.href = '/dashboard/extract';
       })

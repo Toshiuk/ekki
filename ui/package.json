@@ -9,6 +9,7 @@
         "react": "^16.8.6",
         "react-confirm-alert": "^2.4.1",
         "react-dom": "^16.8.6",
+        "react-js-pagination": "^3.0.2",
         "react-loading": "^2.0.3",
         "react-router-dom": "^5.0.1",
         "react-s-alert": "^1.4.1",

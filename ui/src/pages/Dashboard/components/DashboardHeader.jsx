@@ -10,8 +10,7 @@ class DashboardHeader extends Component {
 
   registerToSocket = () => {
     const socket = io('http://localhost:3001');
-
-    socket.on('balance', balanceUser => {
+    socket.on(`balance${sessionStorage.getItem('id')}`, balanceUser => {
       this.setState({ balanceUser })
       sessionStorage.setItem('balance', balanceUser)
     })
@@ -31,6 +30,7 @@ class DashboardHeader extends Component {
   render() {
     return (
       <section className="hero is-primary">
+        <span class="tag is-link">Your Id: {sessionStorage.id}</span>
         <div className="hero-body">
           <div className="container has-text-centered">
             <h1 className="title">
@@ -38,7 +38,7 @@ class DashboardHeader extends Component {
             </h1>
             <h2 className="subtitle">
               Credit Limit: R$ 500,00
-        </h2>
+           </h2>
           </div>
         </div>
       </section>

@@ -22,6 +22,7 @@ const listUserContact = async function listUserContact(req, res) {
 
 const createContact = async function createContact(req, res) {
   const token = getToken(req.headers);
+
   let response = '';
   if (token) {
     response = await Contact.add(req.user.dataValues.id, req.body.contactId);
@@ -37,7 +38,7 @@ const createContact = async function createContact(req, res) {
         },
       ],
     });
-    req.io.emit('contacts', userContacts);
+    req.io.emit(`contacts${req.user.dataValues.id}`, userContacts);
   }
   return res.status(201).send(response) || res.status(403).send({ success: false, msg: 'Unauthorized.' });
 };
@@ -60,7 +61,7 @@ const destroyContact = async function destroyContact(req, res) {
         },
       ],
     });
-    req.io.emit('contacts', userContacts);
+    req.io.emit(`contacts${req.user.dataValues.id}`, userContacts);
   }
   return res.status(201).send(response) || res.status(403).send({ success: false, msg: 'Unauthorized.' });
 };

@@ -7,7 +7,7 @@ const { getToken } = require('../helpers/token');
 
 const signup = (req, res) => {
   if (!req.body.name || !req.body.password || !req.body.cpf || !req.body.phone) {
-    res.status(400).send({ msg: 'Please pass all fields.' });
+    res.status(403).send({ success: false, msg: 'Please pass all fields.' });
   } else {
     User
       .create({
@@ -16,9 +16,9 @@ const signup = (req, res) => {
         cpf: req.body.cpf,
         phone: req.body.phone,
       })
-      .then(user => res.status(201).send(user))
+      .then(user => res.status(201).send({ success: true, msg: 'User created with success, please, login.' }))
       .catch((error) => {
-        res.status(400).send(error);
+        res.status(403).send({ success: false, msg: error.message });
       });
   }
 };
@@ -32,16 +32,16 @@ const login = (req, res) => {
     })
     .then((user) => {
       if (!user) {
-        return res.status(401).send({
+        return res.status(403).send({
           message: 'Authentication failed. User not found.',
         });
       }
       user.comparePassword(req.body.password, (err, isMatch) => {
         if (isMatch && !err) {
           const token = jwt.sign(JSON.parse(JSON.stringify(user)), 'nodeauthsecret', { expiresIn: 86400 * 30 });
-          res.json({ success: true, token: `JWT ${token}` });
+          res.json({ success: true, token: `JWT ${token}`, id: `${JSON.parse(JSON.stringify(user.id))}` });
         } else {
-          res.status(401).send({ success: false, msg: 'Authentication failed. Wrong password.' });
+          res.status(403).send({ success: false, msg: 'Authentication failed. Wrong password.' });
         }
       });
       return true;
@@ -74,7 +74,7 @@ const listAllUsers = async (req, res) => {
 const extract = async (req, res) => {
   const token = getToken(req.headers);
   if (token) {
-    const extractUser = await Historic.findAllFromUserId(req.user.dataValues.id);
+    const extractUser = await Historic.findAllFromUserId(req.user.dataValues.id, req.query.limit, req.query.offset);
     if (extractUser) { return res.status(200).send(extractUser); }
   } else {
     return res.status(403).send({ success: false, msg: 'Unauthorized.' });
@@ -100,8 +100,10 @@ const transfer = async (req, res) => {
     response = await User.transfer(req.user.dataValues, req.body.receiverId, req.body.value);
   }
   if (response.success) {
-    const userBalance = await Historic.balanceFromUserId(req.user.dataValues.id);
-    req.io.emit('balance', userBalance);
+    const userBalanceSender = await Historic.balanceFromUserId(req.user.dataValues.id);
+    const userBalanceReceiver = await Historic.balanceFromUserId(req.body.receiverId);
+    req.io.emit(`balance${req.user.dataValues.id}`, userBalanceSender);
+    req.io.emit(`balance${req.body.receiverId}`, userBalanceReceiver);
   }
   return res.status(201).send(response) || res.status(403).send({ success: false, msg: 'Unauthorized.' });
 };
@@ -114,7 +116,7 @@ const deposit = async (req, res) => {
   }
   if (response.success) {
     const userBalance = await Historic.balanceFromUserId(req.user.dataValues.id);
-    req.io.emit('balance', userBalance);
+    req.io.emit(`balance${req.user.dataValues.id}`, userBalance);
   }
   return res.status(201).send(response) || res.status(403).send({ success: false, msg: 'Unauthorized.' });
 };
@@ -127,7 +129,7 @@ const withdraw = async (req, res) => {
   }
   if (response.success) {
     const userBalance = await Historic.balanceFromUserId(req.user.dataValues.id);
-    req.io.emit('balance', userBalance);
+    req.io.emit(`balance${req.user.dataValues.id}`, userBalance);
   }
   return res.status(201).send(response) || res.status(403).send({ success: false, msg: 'Unauthorized.' });
 };

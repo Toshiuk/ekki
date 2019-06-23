@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import api from '../../../services/api'
 import Select from 'react-select';
-import Alerts from '../components/Alerts'
+import Alerts from '../../../components/Alerts'
 import './Contact.css';
 import Title from '../components/Title'
 import io from 'socket.io-client';
@@ -18,7 +18,7 @@ class DashbordContact extends Component {
   registerToSocket = () => {
     const socket = io('http://localhost:3001');
 
-    socket.on('contacts', contactsUser => {
+    socket.on(`contacts${sessionStorage.getItem('id')}`, contactsUser => {
       console.log(contactsUser)
       this.setState({ contacts: contactsUser });
     })
@@ -32,14 +32,14 @@ class DashbordContact extends Component {
       .then(response => {
         this.setState({ contacts: response.data });
       })
-      .catch(err => alert(err.response.statusText ? err.response.statusText : err.msg));
+      .catch(err => Alerts.warning(err.msg));
     api
       .get("/user/list")
       .then(response => {
         const users = response.data.map(user => { return { value: user.id, label: user.name } })
         this.setState({ users: users });
       })
-      .catch(err => alert(err.response.statusText ? err.response.statusText : err.msg));
+      .catch(err => Alerts.warning(err.msg));
   }
 
   listExtract = () => (

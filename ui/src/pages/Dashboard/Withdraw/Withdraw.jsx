@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import api from '../../../services/api'
 import Title from '../components/Title'
-import Alerts from '../components/Alerts'
+import Alerts from '../../../components/Alerts'
 import FormValue from '../components/FormValue'
 import { Redirect } from 'react-router-dom';
 import Loading from '../../../components/Loading';
@@ -53,7 +53,7 @@ class Withdraw extends Component {
         }
         this.setState({ loading: false });
       })
-      .catch(err => alert(err.response.data.error));
+      .catch(err => alert(Alerts.warning(err.data.msg)));
   };
 
   render() {

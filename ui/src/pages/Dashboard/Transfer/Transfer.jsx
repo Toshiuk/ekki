@@ -5,8 +5,8 @@ import FormValue from '../components/FormValue'
 import { Redirect } from 'react-router-dom';
 import Loading from '../../../components/Loading'
 import Title from '../components/Title'
-import { confirmAlert } from 'react-confirm-alert'; // Import
-import Alerts from '../components/Alerts'
+import { confirmAlert } from 'react-confirm-alert';
+import Alerts from '../../../components/Alerts'
 
 
 class Transfer extends Component {
@@ -24,7 +24,7 @@ class Transfer extends Component {
         const contacts = response.data.map(contact => { return { value: contact.contactId, label: contact.contact.name } })
         this.setState({ contacts });
       })
-      .catch(err => alert(err.response.statusText ? err.response.statusText : err.msg));
+      .catch(err => Alerts.warning(err.msg));
   }
 
   useFromLimit = async (value) => {

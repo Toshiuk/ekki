@@ -4,6 +4,12 @@ const { Op } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
   const Historic = sequelize.define('Historic', {
+    id: {
+      allowNull: false,
+      autoIncrement: true,
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+    },
     value: {
       type: DataTypes.FLOAT,
       allowNull: {
@@ -39,7 +45,7 @@ module.exports = (sequelize, DataTypes) => {
 
   Historic.balanceFromUserId = async (userId) => {
     const extract = await Historic.findAllFromUserId(userId);
-    const convert = await extract.map(e => (e.senderId === userId ? (-1 * e.value) : (e.value)));
+    const convert = await extract.rows.map(e => (e.senderId === userId ? (-1 * e.value) : (e.value)));
 
     const balance = await convert.reduce((acc, e) => acc + e);
     return balance;
@@ -75,14 +81,18 @@ module.exports = (sequelize, DataTypes) => {
         receiverId,
       }).then(historic => response = { success: true, msg: 'Bank transference succeded.' })
         .catch(error => response = { success: false, msg: 'User account Error.' });
-
+      console.log(value);
+      console.log(senderId);
+      console.log(receiverId);
+      console.log(response);
       return response;
     };
 
 
-    Historic.findAllFromUserId = async (userId) => {
+    Historic.findAllFromUserId = async (userId, limit = null, offset = 0) => {
       let extract = [];
-      await Historic.findAll({
+      const options = {
+        distinct: 'Historic.id',
         where: {
           [Op.or]: [
             {
@@ -95,20 +105,33 @@ module.exports = (sequelize, DataTypes) => {
 
 
         },
+        offset,
+        order: [['updatedAt', 'DESC']],
         include: [
           {
             model: models.User,
             as: 'receiver',
+            required: false,
             attributes: ['id', 'name'],
           },
           {
             model: models.User,
             as: 'sender',
+            required: false,
             attributes: ['id', 'name'],
           },
         ],
-      })
-        .then((historics) => {
+      };
+
+      if (limit) { options.limit = limit; }
+
+      await Historic.findAndCountAll(options)
+        .then(async (historics) => {
+          historics.rows = await historics.rows.map((e) => {
+            e.dataValues.senderId == userId ? e.dataValues.positive = false : e.dataValues.positive = true;
+            e.dataValues.senderId && e.dataValues.receiverId ? e.dataValues.type = 'Transfer' : (e.dataValues.senderId ? e.dataValues.type = 'Withdraw' : e.dataValues.type = 'Deposit');
+            return e;
+          });
           extract = historics;
         })
         .catch((error) => { console.log(error); });

@@ -15,7 +15,7 @@ class Main extends Component {
         <p className="subtitle">
           Ekki Bank, Challenge held for the 4All test.
   Using Node.js and React.
-  
+
                 </p>
         <div className="level">
           <div className="level-item dropdown is-hoverable">
@@ -28,10 +28,34 @@ class Main extends Component {
               <div className="dropdown-content">
                 <div className="dropdown-item">
                   <ul>
-                    <li>> Express</li>
-                    <li>> Socket.io</li>
-                    <li>> MVC</li>
-                    <li>> JWT</li>
+                    <li>
+                      <span className="icon is-small"><i className="fas fa-angle-double-right" aria-hidden="true" /></span>
+                      Express
+                    </li>
+                    <li>
+                      <span className="icon is-small"><i className="fas fa-angle-double-right" aria-hidden="true" /></span>
+                      Socket.io
+                    </li>
+                    <li>
+                      <span className="icon is-small"><i className="fas fa-angle-double-right" aria-hidden="true" /></span>
+                      MVC
+                    </li>
+                    <li>
+                      <span className="icon is-small"><i className="fas fa-angle-double-right" aria-hidden="true" /></span>
+                      JWT
+                    </li>
+                    <li>
+                      <span className="icon is-small"><i className="fas fa-angle-double-right" aria-hidden="true" /></span>
+                      Passport.js
+                    </li>
+                    <li>
+                      <span className="icon is-small"><i className="fas fa-angle-double-right" aria-hidden="true" /></span>
+                      Hash Password
+                    </li>
+                    <li>
+                      <span className="icon is-small"><i className="fas fa-angle-double-right" aria-hidden="true" /></span>
+                      ID is UUID
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -47,10 +71,22 @@ class Main extends Component {
               <div className="dropdown-content">
                 <div className="dropdown-item">
                   <ul>
-                    <li>> Axios</li>
-                    <li>> Socket.io</li>
-                    <li>> MVC</li>
-                    <li>> Single Page Aplication</li>
+                    <li>
+                      <span className="icon is-small"><i className="fas fa-angle-double-right" aria-hidden="true" /></span>
+                      Axios
+                    </li>
+                    <li>
+                      <span className="icon is-small"><i className="fas fa-angle-double-right" aria-hidden="true" /></span>
+                      Socket.io
+                    </li>
+                    <li>
+                      <span className="icon is-small"><i className="fas fa-angle-double-right" aria-hidden="true" /></span>
+                      Single Page Aplication
+                    </li>
+                    <li>
+                      <span className="icon is-small"><i className="fas fa-angle-double-right" aria-hidden="true" /></span>
+                      Private Dashboard
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -66,7 +102,14 @@ class Main extends Component {
               <div className="dropdown-content">
                 <div className="dropdown-item">
                   <ul>
-                    <li>> Bulma</li>
+                    <li>
+                      <span className="icon is-small"><i className="fas fa-angle-double-right" aria-hidden="true" /></span>
+                      Bulma
+                    </li>
+                    <li>
+                      <span className="icon is-small"><i className="fas fa-angle-double-right" aria-hidden="true" /></span>
+                      Font Awesome
+                    </li>
                   </ul>
                 </div>
               </div>
